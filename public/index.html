@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PeerJS Video Call</title>
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <h1 class="text-3xl font-bold mb-6">PeerJS Video Call</h1>
+    <p id="p1" class="my-2"></p>
+    
+    <div id="videoContainer" class="flex flex-wrap space-x-4 mb-4">
+        <video id="localVideo" class="border border-gray-300 rounded-lg w-96 h-72" autoplay muted></video>
+    </div>
+
+    <div class="mb-4">
+        <input type="text" id="roomId" placeholder="Enter room ID" class="border border-gray-300 rounded-lg p-2 mb-2 w-64">
+        <button id="createRoomButton" class="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600">Create Room</button>
+        <button id="joinRoomButton" class="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600">Join Room</button>
+    </div>
+
+    <div class="flex space-x-2">
+        <button id="endCallButton" class="bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600">End Call</button>
+        <button id="toggleVideoButton" class="bg-yellow-500 text-white rounded-lg px-4 py-2 hover:bg-yellow-600">Toggle Video</button>
+        <button id="toggleMicButton" class="bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600">Toggle Mic</button>
+    </div>
+
+    <script>
+        const localVideo = document.getElementById('localVideo');
+        const videoContainer = document.getElementById('videoContainer');
+        const roomIdInput = document.getElementById('roomId');
+        const createRoomButton = document.getElementById('createRoomButton');
+        const joinRoomButton = document.getElementById('joinRoomButton');
+        const endCallButton = document.getElementById('endCallButton');
+        const toggleVideoButton = document.getElementById('toggleVideoButton');
+        const toggleMicButton = document.getElementById('toggleMicButton');
+        let id1 = document.getElementById("p1");
+
+        let localStream;
+        let currentCalls = [];
+        let peer;
+
+        // Function to initialize Peer
+        function initializePeer() {
+            peer = new Peer();
+            peer.on('open', id => {
+                console.log('My peer ID is: ' + id);
+                id1.textContent = id;
+                roomIdInput.value = id; // Set the input to the peer ID
+            });
+
+            // Listen for incoming calls
+            peer.on('call', call => {
+                call.answer(localStream); // Answer the call with the local stream
+                currentCalls.push(call); // Store the call
+                addRemoteVideo(call); // Add remote video
+            });
+        }
+
+        // Get local media stream
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                localStream = stream;
+                localVideo.srcObject = stream;
+                initializePeer();
+            })
+            .catch(err => {
+                console.error('Failed to get local stream', err);
+            });
+
+        // Create a room
+        createRoomButton.addEventListener('click', () => {
+            const roomId = roomIdInput.value;
+            if (roomId) {
+                console.log(`Room created with ID: ${roomId}`);
+                // You can implement additional logic here to manage room creation
+            }
+        });
+
+        // Join a room
+        joinRoomButton.addEventListener('click', () => {
+            const roomId = roomIdInput.value;
+            if (roomId) {
+                console.log(`Joining room with ID: ${roomId}`);
+                // Call the peer with
+                // Call the peer with the room ID
+                const call = peer.call(roomId, localStream);
+                currentCalls.push(call); // Store the call
+                addRemoteVideo(call); // Add remote video
+            }
+        });
+
+        // Function to add remote video element
+        function addRemoteVideo(call) {
+            const remoteVideo = document.createElement('video');
+            remoteVideo.className = 'border border-gray-300 rounded-lg w-96 h-72';
+            remoteVideo.autoplay = true;
+            videoContainer.appendChild(remoteVideo); // Add to video container
+
+            call.on('stream', remoteStream => {
+                remoteVideo.srcObject = remoteStream; // Show the remote stream
+            });
+
+            call.on('close', () => {
+                remoteVideo.remove(); // Remove video element when call ends
+                currentCalls = currentCalls.filter(c => c !== call); // Remove call from current calls
+            });
+        }
+
+        // End all calls
+        endCallButton.addEventListener('click', () => {
+            currentCalls.forEach(call => {
+                call.close(); // Close each call
+            });
+            currentCalls = []; // Clear current calls
+            videoContainer.querySelectorAll('video:not(#localVideo)').forEach(video => video.remove());
+        });
+
+        // Toggle video
+        toggleVideoButton.addEventListener('click', () => {
+            const videoTrack = localStream.getVideoTracks()[0];
+            videoTrack.enabled = !videoTrack.enabled; // Toggle video track
+            toggleVideoButton.textContent = videoTrack.enabled ? 'Turn Off Video' : 'Turn On Video';
+        });
+
+        // Toggle microphone
+        toggleMicButton.addEventListener('click', () => {
+            const audioTrack = localStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled; // Toggle audio track
+            toggleMicButton.textContent = audioTrack.enabled ? 'Mute Mic' : 'Unmute Mic';
+        });
+    </script>
+</body>
+
+</html>
