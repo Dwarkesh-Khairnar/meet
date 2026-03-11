@@ -6,6 +6,6 @@
     - html
     - css
     - js
-    - node
-    - express
-    - peerjs
+    - nodeJs
+    - expressJs
+    - peerJs
