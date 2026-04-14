@@ -4,7 +4,7 @@
 
   ## teck stack
     - html
-    - css
+    - css (Tailwind)
     - js
     - nodeJs
     - expressJs
