@@ -1,4 +1,4 @@
-# Meeting Component
+# Meeting Component (Peer.js)
 
 - ### this is prebilde commponet that replica of google meet
 
