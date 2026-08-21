@@ -9,7 +9,7 @@
     - nodeJs
     - express js
     - peerJs
-    - 
+    - vercel
 ## tech use for call
   - peer js
   - 
