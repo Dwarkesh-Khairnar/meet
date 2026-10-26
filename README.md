@@ -16,7 +16,10 @@
 - ### its not good his loss connection and loss same words on call
 
 ### flow and use diagram 
+
                       start
                         |
-                        wait for connection code
+              wait for connection code
+                        |
+        share code useing a whatsapp or message
                         
