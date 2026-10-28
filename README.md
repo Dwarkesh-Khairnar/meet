@@ -17,9 +17,9 @@
 
 ### flow and use diagram 
 
-                      start
-                        |
-              wait for connection code
-                        |
-        share code useing a whatsapp or message
+                         start
+                           |
+                 wait for connection code
+                           |
+           share code useing a whatsapp or message
                         
