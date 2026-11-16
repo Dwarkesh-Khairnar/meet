@@ -24,3 +24,5 @@
                        share code useing a whatsapp or message
                                           |
                      Next user open a Owen web and enter that code
+                                          |
+                           then connection will stablish 
